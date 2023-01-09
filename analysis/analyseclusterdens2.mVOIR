@@ -1,0 +1,97 @@
+function [auxdens, stopanalysis]=analyseclusterdens2(handles)
+% function [auxdens, stopanalysis]=analyseclusterdens2(handles)
+%
+% Analysis of clustering for Diinamic. One file each time.
+%
+% Marianne Renner 2021
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+stopanalysis=0;
+
+filename=handles.file;
+
+namefile=get(handles.namefile,'String');
+
+if size(namefile,2)==0
+    [namefile,~]=strtok(filename,'.') %sin extension
+    set(handles.namefile,'String',namefile);
+end
+dx = str2num(get(handles.PALMszpx,'String'));
+sigmaloc = dx*2;
+szpx = str2num(get(handles.szpx,'String'));
+
+
+%--------------------------------------------------------------------
+disp(' ');
+disp('Analysing clustering by density');
+
+resultsout=[];
+resdistance=[];
+distance=[];
+
+                varargin{1} = handles.I;
+                varargin{2} = []; %roifile;
+                varargin{3} = handles.fr;
+                varargin{4} = handles.alpha;
+                varargin{5} = filename;  
+                varargin{6} = dx;
+                varargin{7} = szpx;
+                
+                if length(dir('auxiliar.mat'))>0  
+                    delete auxiliar.mat        %clears previous results
+                end
+                
+               % varargout=MaskRendered(varargin); 
+                varargout=DetectClusters(varargin); 
+                uiwait;   
+              
+                %read results (in auxiliar.mat) 
+                control=0;
+                aux='auxiliar.mat'; 
+
+                if length(dir(aux))>0  
+                    load(aux,'-mat')
+                    
+                        resultsout=[resultsout; roij*ones(size(resultsclu,1),1) resultsclu];
+                    
+                        % # clusters per distance in ROI
+                         if isempty(distance)==0     % ATT distance en pixels!!!!!!!!!!!!
+                            resdistance=[resdistance; roij size(resultsclu,1) distance{roij} size(resultsclu,1)/distance{roij} ];
+                                 %  nro roi - number of clusters - length - number of clusters/length
+                         end
+                    
+                        imagename=[namefile,'-roi',num2str(roij),'-maskrend.mat'];
+                        save(imagename,'imagemask','-mat') 
+                    
+                
+                     delete 'auxiliar.mat'
+                end % empty results from maskrendered (aux)
+ 
+% parameters
+
+auxdens{1}=resultsout;
+auxdens{2}=resdistance;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function newBWlocmatrix=loadloc(locfilename,sizerend)
+% load localization file 
+ 
+newBWlocmatrix=[];  
+
+if isempty(dir(locfilename))==1
+    disp('No localization file found');
+    return
+end
+
+locmatrix=double(imread(locfilename));
+
+%binarize
+level = graythresh(locmatrix);
+BWlocmatrix = im2bw(locmatrix,level);
+
+%convert to rendered size
+newBWlocmatrix = imresize(BWlocmatrix,[sizerend(1),sizerend(2)]);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
