@@ -6,10 +6,7 @@ Diinamic is a MATLAB-based modulable sequence of cluster detection steps that co
 In Diinamic-R, the use of a grid-based selection, whose grid size is based on the pixel size of rendered images, introduces a density criterium that also considers the localization precision. The use of the smallest possible grid size also made the choice of the size unambiguous, and the analysis independent of the shape and size of clusters.
 Please refer to the article for more information about how the analysis is done and now parameters must be chosen:
 Paupiah et al (2023). “Introducing Diinamic, a flexible and robust method for clustering analysis in single molecule localization microscopy”. Submitted to Biological Imaging.
-If you have difficulties to implement the analysis, please contact 
-marianne.renner@sorbonne-universite.fr
-
-#Running Diinamic
+If you have difficulties to implement the analysis, please contact marianne.renner@sorbonne-universite.fr
 
 To use Diinamic, you have to:
 
